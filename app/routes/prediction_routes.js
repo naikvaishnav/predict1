@@ -43,6 +43,7 @@ module.exports = function(app, db) {
 	});
 
 	app.post('/getusers', (req, res) => {
+		console.log('Inside')
 	    var dbo = db.db("prediction");
 		dbo.collection("users").find().toArray(function(err, result) {
 		    if (err) {
