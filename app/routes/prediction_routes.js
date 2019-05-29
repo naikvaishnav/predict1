@@ -77,7 +77,7 @@ module.exports = function(app, db) {
 								{unique_id: livaMatchData.matches[i].unique_id},
 								[['unique_id','asc']],  // sort order
 								{ $set: livaMatchData.matches[i] }, // replacement, replaces only the field "hi"
-								{upsert: true, new: true}, // options
+								{upsert: false, new: true}, // options
 								function(err, object) {
 				    				if (err){
 				      					// res.send({ 'error': 'An error has occurred' });
