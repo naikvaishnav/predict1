@@ -8,7 +8,7 @@ const app            = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 
 
-MongoClient.connect("mongodb+srv://Vaishnav:Vaishnav123@prd-pwuxx.mongodb.net/prediction?retryWrites=true", function(err, db) {
+MongoClient.connect("mongodb+srv://Vaishnav:Vaishnav123@prd-pwuxx.mongodb.net/predict1?retryWrites=true", function(err, db) {
   if(err) console.log(err);
   require('./app/routes')(app, db);
     app.listen(process.env.PORT || 8080);
