@@ -1,4 +1,5 @@
 var request = require('request');
+var moment = require('moment');
 
 module.exports = function(app, db) {
 
@@ -27,19 +28,23 @@ module.exports = function(app, db) {
 	});
 
 	app.post('/login', (req, res) => {
-	    var dbo = db.db("prediction");
-	    var query = { email: req.query.email };
-		dbo.collection("users").find(query).toArray(function(err, result) {
-		    if (err) {
-		    	res.send({ 'error': 'An error has occurred' });
-		    } else {
-		    	if(!result.length){
-					res.send({ 'message': 'User not available' });
-		    	} else {
-		    		res.send({'message': 'Success'});
-		    	}
-		    }
-		});
+		if(req.query.updated){
+		    var dbo = db.db("prediction");
+		    var query = { email: req.query.email };
+			dbo.collection("users").find(query).toArray(function(err, result) {
+			    if (err) {
+			    	res.send({ 'error': 'An error has occurred' });
+			    } else {
+			    	if(!result.length){
+						res.send({ 'message': 'User not available' });
+			    	} else {
+			    		res.send({'message': 'Success'});
+			    	}
+			    }
+			});
+		}else{
+			res.send({ 'error': 'Update your app' });
+		}
 	});
 
 	app.post('/getusers', (req, res) => {
@@ -107,22 +112,28 @@ module.exports = function(app, db) {
 	});
 
 	app.post('/setprediction', (req, res) => {
-	    var dbo = db.db("prediction");
-		dbo.collection('user_prediction').findAndModify(
-			{email:req.query.email, unique_id: req.query.unique_id, team1: req.query.team1, team2: req.query.team2, winner_team: null},
-			[['unique_id','asc']],  // sort order
-			{ $set: { prediction: req.query.prediction } }, // replacement, replaces only the field "hi"
-			{upsert: true, new: true}, // options
-			function(err, object) {
-			    if (err){
-			      	res.send({ 'error': 'An error has occurred' });
-			        console.log(err.message);  // returns error if no matching object found
-			    }else{
-			      	res.send({'data': 'success'});
-			        console.log(object);
+		let durationLeft = moment(req.query.date).endOf('hour').fromNow().split(' ')[2];
+		// console.log(durationLeft);
+		if(durationLeft === 'hour' || durationLeft === 'ago'){
+		    res.send({ 'data': 'timeover' });
+		}else{
+			var dbo = db.db("prediction");
+			dbo.collection('user_prediction').findAndModify(
+				{email:req.query.email, unique_id: req.query.unique_id, team1: req.query.team1, team2: req.query.team2, winner_team: null},
+				[['unique_id','asc']],  // sort order
+				{ $set: { prediction: req.query.prediction } }, // replacement, replaces only the field "hi"
+				{upsert: true, new: true}, // options
+				function(err, object) {
+				    if (err){
+				      	res.send({ 'data': 'An error has occurred' });
+				        // console.log(err.message);  // returns error if no matching object found
+				    }else{
+				      	res.send({'data': 'success'});
+				        // console.log(object);
+				    }
 			    }
-		    }
-		);
+			);
+		}
 	});
 
 	app.post('/showprediction', (req, res) => {
