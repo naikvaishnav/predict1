@@ -28,7 +28,7 @@ module.exports = function(app, db) {
 	});
 
 	app.post('/login', (req, res) => {
-		if(req.query.updated){
+		if(req.query.updated == 2){
 		    var dbo = db.db("prediction");
 		    var query = { email: req.query.email };
 			dbo.collection("users").find(query).toArray(function(err, result) {
