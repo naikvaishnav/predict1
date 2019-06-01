@@ -73,29 +73,29 @@ module.exports = function(app, db) {
 	
 
 	app.post('/matcheslist', (req, res) => {
-		// request('https://cricapi.com/api/matches?apikey=HJwez63lSmRrFffrXsGAZgwIsZm1', function (error, response, body) {
-		//     if (!error && response.statusCode == 200) {
-		//         let livaMatchData = JSON.parse(body);
-		// 		let count = 0;
-		// 		livaMatchData.matches.forEach((match) => {
-		// 			count += 1;
-		// 			if(match.type === "ODI" && match.matchStarted && Number(match.unique_id) > 114482 && Number(match.unique_id) < 114530){
-		// 				var dbo = db.db("prediction");
-		// 				dbo.collection('matches').findAndModify(
-		// 					{unique_id: match.unique_id},
-		// 					[['unique_id','asc']],
-		// 					{ $set: match },
-		// 					{upsert: true, new: true},
-		// 					function(err, object) {
-		// 						if (err){
-		// 							// console.log('error', err);
-		// 						}else{
-		// 							// console.log('success');
-		// 						}
-		// 					}
-		// 				);
-		// 			}
-		// 			if(count === livaMatchData.matches.length){
+		request('https://cricapi.com/api/matches?apikey=HJwez63lSmRrFffrXsGAZgwIsZm1', function (error, response, body) {
+		    if (!error && response.statusCode == 200) {
+		        let livaMatchData = JSON.parse(body);
+				let count = 0;
+				livaMatchData.matches.forEach((match) => {
+					count += 1;
+					if(match.type === "ODI" && match.matchStarted && (match.unique_id > 1144482) && (match.unique_id < 1144530)){
+						var dbo = db.db("prediction");
+						dbo.collection('matches').findAndModify(
+							{unique_id: match.unique_id},
+							[['unique_id','asc']],
+							{ $set: match },
+							{upsert: true, new: true},
+							function(err, object) {
+								if (err){
+									// console.log('error', err);
+								}else{
+									// console.log('success');
+								}
+							}
+						);
+					}
+					if(count === livaMatchData.matches.length){
 						setTimeout(function(){
 							var dbo = db.db("prediction");
 							dbo.collection("matches").find().toArray(function(err, result) {
@@ -106,10 +106,10 @@ module.exports = function(app, db) {
 								}
 							});
 						}, 3000);
-		// 			}
-		//         });
-		//     }
-		// })    
+					}
+		        });
+		    }
+		})    
 	});
 
 	app.post('/setprediction', (req, res) => {
@@ -141,10 +141,10 @@ module.exports = function(app, db) {
 	    var dbo = db.db("prediction");
 		dbo.collection("matches").find({matchStarted: true}).toArray(function(err, result) {
 		    if (err) {
-		    	console.log(err);
+		    	// console.log(err);
 		    	res.send({ 'message': 'An error has occurred' });
 		    } else {
-				console.log(result);
+				// console.log(result);
 				let matches = [];
 				let count = 0;
 				result.forEach((match) => {
@@ -172,6 +172,7 @@ module.exports = function(app, db) {
 			    	let tempObj = {};
 			    	if(!output.length){
 			    		tempObj = {
+							email: myDoc.email,
 			    			fname: myDoc.fname,
 			    			lname: myDoc.lname,
 			    			prediction: "LS"
@@ -180,6 +181,7 @@ module.exports = function(app, db) {
 			    	} 
 			    	else {
 			    		tempObj = {
+							email: myDoc.email,
 			    			fname: myDoc.fname,
 			    			lname: myDoc.lname,
 			    			prediction: output[0].prediction
