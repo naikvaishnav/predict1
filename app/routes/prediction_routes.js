@@ -98,7 +98,7 @@ module.exports = function(app, db) {
 					if(count === livaMatchData.matches.length){
 						setTimeout(function(){
 							var dbo = db.db("prediction");
-							dbo.collection("matches").find().toArray(function(err, result) {
+							dbo.collection("matches").find().sort({unique_id: 1}).toArray(function(err, result) {
 								if (err) {
 									res.send({'data':{ 'error': 'An error has occurred' }});
 								} else {
